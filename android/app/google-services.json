@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "910196917940",
+    "project_id": "cardatabase-58e52",
+    "storage_bucket": "cardatabase-58e52.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:910196917940:android:a832ba9563057a1a79b9e1",
+        "android_client_info": {
+          "package_name": "com.example.rental_car_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAm4JROwhPOhPllUdK-8khG7wYLydP4Rx8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
