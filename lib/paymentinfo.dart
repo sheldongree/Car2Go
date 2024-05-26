@@ -1,8 +1,6 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class PaymentInfoWidget extends StatefulWidget {
   final String brand;
@@ -26,8 +24,6 @@ class PaymentInfoWidget extends StatefulWidget {
 
 class _PaymentInfoWidgetState extends State<PaymentInfoWidget> {
   late String confirmationNumber;
-  bool _isLoading = true;
-  String? _errorMessage;
 
   @override
   void initState() {
@@ -42,47 +38,15 @@ class _PaymentInfoWidgetState extends State<PaymentInfoWidget> {
     return random.nextInt(999999).toString().padLeft(6, '0');
   }
 
-  Future<void> _storePaymentInfo() async {
-    // Get the current user
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      try {
-        // Fetch the user data from the "users" collection
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-
-        if (userDoc.exists) {
-          var userData = userDoc.data() as Map<String, dynamic>;
-
-          // Store payment information in the "purchased" collection
-          await FirebaseFirestore.instance.collection('purchased').add({
-            'userId': user.uid, // Store the user's ID
-            'brand': widget.brand,
-            'year': widget.year,
-            'totalPrice': widget.totalPrice,
-            'startDate': widget.startDate,
-            'endDate': widget.endDate,
-            'confirmationNumber': confirmationNumber,
-            'fullName': userData['full_name'] ?? 'N/A',
-            'email': userData['email'] ?? 'N/A',
-          });
-        } else {
-          setState(() {
-            _errorMessage = 'User document does not exist.';
-          });
-        }
-      } catch (e) {
-        setState(() {
-          _errorMessage = 'Error fetching user data: $e';
-        });
-      }
-    } else {
-      setState(() {
-        _errorMessage = 'No user is currently signed in.';
-      });
-    }
-    setState(() {
-      _isLoading = false;
+  void _storePaymentInfo() async {
+    // Store payment information in the "purchased" collection
+    await FirebaseFirestore.instance.collection('purchased').add({
+      'brand': widget.brand,
+      'year': widget.year,
+      'totalPrice': widget.totalPrice,
+      'startDate': widget.startDate,
+      'endDate': widget.endDate,
+      // Add other fields as needed
     });
   }
 
@@ -115,11 +79,7 @@ class _PaymentInfoWidgetState extends State<PaymentInfoWidget> {
       ),
       body: SafeArea(
         top: true,
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : _errorMessage != null
-            ? Center(child: Text(_errorMessage!, style: TextStyle(color: Colors.red, fontSize: 16)))
-            : Container(
+        child: Container(
           decoration: BoxDecoration(
             color: Colors.black,
             image: DecorationImage(
@@ -141,7 +101,10 @@ class _PaymentInfoWidgetState extends State<PaymentInfoWidget> {
                     BoxShadow(
                       blurRadius: 5,
                       color: Color(0x411D2429),
-                      offset: Offset(0.0, 2),
+                      offset: Offset(
+                        0.0,
+                        2,
+                      ),
                     )
                   ],
                 ),
@@ -154,11 +117,14 @@ class _PaymentInfoWidgetState extends State<PaymentInfoWidget> {
                       SizedBox(height: 20),
                       _buildInfoRow('Car', '${widget.brand}, ${widget.year}'),
                       SizedBox(height: 20),
-                      _buildInfoRow('Rent Date', DateFormat('yyyy/MM/dd').format(widget.startDate)),
+                      _buildInfoRow('Rent Date',
+                          '${widget.startDate.year}/${widget.startDate.month}/${widget.startDate.day}'),
                       SizedBox(height: 20),
-                      _buildInfoRow('Return Date', DateFormat('yyyy/MM/dd').format(widget.endDate)),
+                      _buildInfoRow('Return Date',
+                          '${widget.endDate.year}/${widget.endDate.month}/${widget.endDate.day}'),
                       SizedBox(height: 20),
-                      _buildInfoRow('Total Price', '\$${widget.totalPrice.toStringAsFixed(2)}'),
+                      _buildInfoRow('Total Price',
+                          '\$${widget.totalPrice.toStringAsFixed(2)}'),
                     ],
                   ),
                 ),
